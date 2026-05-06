@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BESSO® — VERY HOT BURGER | FOGGIA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
+    <style>
+        /* ============ VARIABLES ============ */
+        :root {
+            --bg: #050505;
+            --red: #e30613;
+            --red-dark: #8b0000;
+            --red-glow: rgba(227,6,19,0.35);
+            --white: #f5f0e8;
+            --yellow: #f5c700;
+            --font-display: 'Oswald', sans-serif;
+            --font-condensed: 'Barlow Condensed', sans-serif;
+            --font-body: 'Barlow', sans-serif;
+            --radius: 2px;
+        }
+
+        /* ============ RESET & BASE ============ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            background: var(--bg);
+            color: var(--white);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            cursor: none;
+        }
+        @media (hover: none) { body { cursor: auto; } }
+
+        @media (max-width: 768px) {
+            * { text-align: center !important; }
+            .split-tag::before { display: none; }
+            .split p { max-width: 100% !important; }
+            .location-badge { justify-content: center; }
+            .footer-bottom { justify-content: center; }
+            .orari-strip { gap: 30px; }
+        }
+
+        img { display: -webkit-inline-box; max-width: 100%; }
+        a { color: inherit; text-decoration: none; }
+
+        /* ============ CUSTOM CURSOR ============ */
+        #cursor {
+            position: fixed;
+            width: 14px; height: 14px;
+            background: var(--red);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            mix-blend-mode: difference;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, opacity 0.2s;
+        }
+        #cursor.big { width: 50px; height: 50px; }
+        @media (hover: none) { #cursor { display: none; } }
+
+        /* ============ NAV ============ */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 5%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%);
+            backdrop-filter: blur(0px);
+            transition: background 0.4s, backdrop-filter 0.4s, padding 0.3s;
+        }
+        nav.scrolled {
+            background: rgba(5,5,5,0.97);
+            backdrop-filter: blur(10px);
+            padding: 12px 5%;
+            border-bottom: 1px solid rgba(227,6,19,0.2);
+        }
+        .nav-logo {
+            font-family: var(--font-display);
+            font-size: clamp(1.4rem, 3vw, 1.8rem);
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--white);
+        }
+        .nav-logo span { color: var(--red); }
+
+        .nav-links {
+            display: flex;
+            gap: clamp(20px, 4vw, 50px);
+            list-style: none;
+        }
+        .nav-links a {
+            font-family: var(--font-condensed);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            transition: color 0.2s;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -3px; left: 0; right: 0;
+            height: 1px;
+            background: var(--red);
+            transform: scaleX(0);
+            transition: transform 0.2s;
+        }
+        .nav-links a:hover { color: var(--white); }
+        .nav-links a:hover::after { transform: scaleX(1); }
+
+        /* hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            z-index: 1010;
+        }
+        .hamburger span {
+            display: block;
+            width: 26px; height: 2px;
+            background: var(--white);
+            transition: transform 0.3s, opacity 0.3s;
+        }
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 1005;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .mobile-menu.open { opacity: 1; }
+        .mobile-menu a {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 12vw, 5rem);
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--white);
+            transition: color 0.2s;
+        }
+        .mobile-menu a:hover { color: var(--red); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+        }
+
+        /* ============ HERO ============ */
+        .hero {
+            position: relative;
+            height: 100svh;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: var(--bg);
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('images/bg.webp') center/cover no-repeat;
+            transform: scale(1.08);
+            filter: brightness(0.35) saturate(1.2);
+            z-index: 0;
+        }
+        /* grain overlay */
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            background-size: 200px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        /* red bottom border */
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--red);
+            z-index: 5;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-tag {
+            font-family: var(--font-condensed);
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeUp 0.8s 0.2s forwards;
+        }
+
+        .hero-h1 {
+            font-family: var(--font-display);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 0.85;
+            font-size: clamp(5rem, 18vw, 20rem);
+            letter-spacing: -2px;
+            opacity: 0;
+            animation: fadeUp 0.8s 0.4s forwards;
+        }
+        .hero-h1 .outline {
+            color: transparent;
+            -webkit-text-stroke: 2px var(--white);
+        }
+        .hero-h1 .solid {
+            color: var(--red);
+            position: relative;
+            display: inline-block;
+            transition: color 0.3s;
+        }
+        .hero-h1 .solid::after {
+            content: attr(data-hover);
+            position: absolute;
+            left: 0; right: 0;
+            color: var(--red);
+            -webkit-text-stroke: 0px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .hero-h1:hover .solid { color: transparent; -webkit-text-stroke: 0px; }
+        .hero-h1:hover .solid::after { opacity: 1; }
+
+        .hero-sub {
+            font-family: var(--font-condensed);
+            font-size: clamp(1rem, 3vw, 1.6rem);
+            font-weight: 700;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: #fff;
+            margin-top: 16px;
+            opacity: 0;
+            animation: fadeUp 0.8s 0.6s forwards;
+        }
+
+        .hero-cta-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeUp 0.8s 0.8s forwards;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 42px;
+            background: transparent;
+            color: var(--red);
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border: 2px solid var(--red);
+            transition: background 0.25s, color 0.25s, transform 0.2s, box-shadow 0.25s;
+        }
+        .btn-primary:hover {
+            background: var(--red);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px var(--red-glow);
+        }
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 36px;
+            background: transparent;
+            color: var(--white);
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border: 2px solid rgba(245,240,232,0.3);
+            transition: border-color 0.25s, color 0.25s;
+        }
+        .btn-ghost:hover { border-color: var(--white); }
+
+        /* stickers */
+        .stickers { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+        .sticker {
+            position: absolute;
+            font-family: var(--font-condensed);
+            font-weight: 900;
+            text-transform: uppercase;
+            pointer-events: all;
+            padding: 8px 18px;
+            font-size: clamp(0.7rem, 1.5vw, 0.95rem);
+            letter-spacing: 1px;
+            cursor: grab;
+            user-select: none;
+        }
+        .s1 { top: 20%; left: 6%; background: var(--red); color: var(--white); transform: rotate(-6deg); }
+        .s2 { top: 18%; right: 7%; background: var(--white); color: #111; transform: rotate(5deg); }
+        .s3 { bottom: 22%; left: 8%; border: 2px solid var(--red); color: var(--red); transform: rotate(12deg); }
+        .s4 { bottom: 18%; right: 9%; background: var(--yellow); color: #111; transform: rotate(-5deg); }
+        @media (max-width: 768px) {
+            .sticker { display: none; }
+        }
+
+        img.sticker {
+            width: clamp(80px, 12vw, 170px);
+            height: auto;
+            background: none;
+            padding: 0;
+            border: none;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ MARQUEE ============ */
+        .marquee-strip {
+            background: var(--bg);
+            overflow: hidden;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+            border-top: 1px solid rgba(245,240,232,0.06);
+            border-bottom: 1px solid rgba(245,240,232,0.06);
+        }
+        .marquee-inner {
+            display: flex;
+            width: max-content;
+            animation: marqueeScroll 72s linear infinite;
+        }
+        .marquee-inner span {
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: clamp(5rem, 14vw, 11rem);
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            color: transparent;
+            -webkit-text-stroke: 2px #e30613;
+            white-space: nowrap;
+            padding: 0 30px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        .marquee-inner span::before { display: none; }
+        @keyframes marqueeScroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        /* ============ SECTION TITLE ============ */
+        .section-label {
+            font-family: var(--font-condensed);
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 12px;
+        }
+        .section-title {
+            font-family: var(--font-display);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 0.9;
+        }
+        .section-title .outline {
+            color: transparent;
+            -webkit-text-stroke: 2px var(--red);
+        }
+        .section-title .solid { color: var(--red); }
+
+        /* ============ MENU — HORIZONTAL SCROLL PINNED ============ */
+        .menu-section {
+            background: var(--bg);
+        }
+
+        /* sticky header above the pin */
+        .menu-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 80px 5% 40px;
+        }
+        .menu-title { font-size: clamp(3rem, 10vw, 8rem); }
+
+        /* the pinned horizontal strip */
+        .horizontal-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            background: var(--bg);
+            overflow: hidden;
+            /* padding-left gives breathing room before first card */
+            padding-left: 5vw;
+            gap: 0;
+        }
+
+        .product-panel {
+            flex-shrink: 0;
+            width: clamp(280px, 38vw, 500px);
+            padding: 0 clamp(16px, 3vw, 40px);
+            text-align: center;
+        }
+
+        .menu-card {
+            position: relative;
+            aspect-ratio: 3/4;
+            overflow: hidden;
+            background: #0e0e0e;
+            cursor: pointer;
+            width: 100%;
+        }
+        .menu-card-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.5s;
+            filter: grayscale(0.45) brightness(0.75);
+        }
+        .menu-card:hover .menu-card-img {
+            transform: scale(1.06);
+            filter: grayscale(0) brightness(0.95);
+        }
+        .menu-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 60%);
+        }
+        .menu-card-body {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 24px 20px;
+        }
+        .menu-card-name {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+        .menu-card-name.outline {
+            color: transparent;
+            -webkit-text-stroke: 1.5px var(--white);
+        }
+        .menu-card-desc {
+            font-size: 0.82rem;
+            color: rgba(245,240,232,0.5);
+            margin-top: 8px;
+            font-style: italic;
+            letter-spacing: 0.5px;
+        }
+        .menu-card-price {
+            position: absolute;
+            top: 16px; right: 16px;
+            background: var(--red);
+            color: var(--white);
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 5px 14px;
+            letter-spacing: 1px;
+        }
+        .menu-card-number {
+            position: absolute;
+            top: 16px; left: 16px;
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: rgba(245,240,232,0.25);
+        }
+
+        /* drag hint arrow visible before scroll */
+        .drag-hint {
+            flex-shrink: 0;
+            padding: 0 40px 0 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.35;
+        }
+        .drag-hint span {
+            font-family: var(--font-condensed);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            writing-mode: vertical-rl;
+            color: var(--white);
+        }
+        .drag-hint i { font-size: 1.2rem; color: var(--red); }
+
+        /* On mobile: no pin, just snap horizontal scroll */
+        @media (max-width: 768px) {
+            .horizontal-section {
+                height: auto;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                scroll-snap-type: x mandatory;
+                scrollbar-width: none;
+                padding: 30px 5vw 40px;
+            }
+            .horizontal-section::-webkit-scrollbar { display: none; }
+            .product-panel {
+                scroll-snap-align: start;
+                width: 75vw;
+                padding: 0 10px;
+            }
+            .drag-hint { display: none; }
+        }
+
+        /* ============ COUNTER / NUMBERS ============ */
+        .numbers-section {
+            background: #000;
+            padding: 0px 5%;
+        }
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+        }
+        @media (max-width: 768px) { .numbers-grid { grid-template-columns: repeat(2, 1fr); } }
+        .number-item {
+            text-align: center;
+            padding: 40px 20px;
+            border-right: 1px solid rgba(255,255,255,0.15);
+        }
+        .number-item:last-child { border-right: none; }
+        @media (max-width: 768px) {
+            .number-item:nth-child(2) { border-right: none; }
+            .number-item:nth-child(1),
+            .number-item:nth-child(2) { border-bottom: 1px solid rgba(255,255,255,0.15); }
+        }
+        .number-val {
+            font-family: var(--font-display);
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            font-weight: 900;
+            color: var(--white);
+            line-height: 1;
+        }
+        .number-label {
+            font-family: var(--font-condensed);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.65);
+            margin-top: 8px;
+        }
+
+        /* ============ SPLIT SECTIONS ============ */
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 80vh;
+        }
+        @media (max-width: 768px) {
+            .split { grid-template-columns: 1fr; min-height: auto; }
+            .split .img-side { aspect-ratio: 4/3; order: -1; }
+        }
+        .split .text-side {
+            padding: clamp(40px, 8%, 10%) clamp(30px, 6%, 8%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #050505;
+        }
+        .split.reverse .text-side { background: #080808; }
+        .split .img-side {
+            position: relative;
+            overflow: hidden;
+        }
+        .split .img-side img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: grayscale(0.5) brightness(0.8);
+            transition: filter 0.8s, transform 0.8s;
+        }
+        .split:hover .img-side img {
+            filter: grayscale(0) brightness(0.95);
+            transform: scale(1.03);
+        }
+        .split-big-title { font-size: clamp(3.5rem, 8vw, 9rem); margin-bottom: 28px; }
+        .split p {
+            font-size: clamp(0.95rem, 2vw, 1.20rem);
+            line-height: 1.8;
+            color: darkgrey;
+            max-width: 480px;
+        }
+        .split-tag {
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-condensed);
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 16px;
+        }
+        .split-tag::before { content: ''; width: 30px; height: 1px; background: var(--red); }
+
+        /* address badge in location section */
+        .location-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 28px;
+            padding: 12px 24px;
+            border: 1px solid rgba(245,240,232,0.15);
+            font-family: var(--font-condensed);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(245,240,232,0.7);
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .location-badge:hover { border-color: var(--red); color: var(--white); }
+        .location-badge i { color: var(--red); }
+
+        /* ============ COLLAB / MARQUEE LARGE ============ */
+        .collab-section {
+            background: var(--bg);
+            border-top: 1px solid rgba(245,240,232,0.06);
+            border-bottom: 1px solid rgba(245,240,232,0.06);
+            padding: 30px 0;
+            overflow: hidden;
+        }
+        .collab-track {
+            display: flex;
+            gap: 80px;
+            width: max-content;
+            animation: marqueeScroll 20s linear infinite;
+        }
+        .collab-track span {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            color: transparent;
+            -webkit-text-stroke: 1.5px rgba(245,240,232,0.12);
+            white-space: nowrap;
+            transition: -webkit-text-stroke-color 0.3s;
+        }
+        .collab-track span:hover {
+            -webkit-text-stroke-color: var(--red);
+        }
+
+        /* ============ SOCIAL / FOLLOW ============ */
+        .follow-section {
+            background: #000;
+            padding: 100px 5%;
+            text-align: center;
+        }
+        .follow-title { font-size: clamp(3rem, 10vw, 8rem); margin-bottom: 16px; }
+        .follow-sub {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: rgba(245,240,232,0.45);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: var(--font-condensed);
+            margin-bottom: 40px;
+        }
+        .social-grid {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            border: 1px solid rgba(245,240,232,0.15);
+            font-family: var(--font-condensed);
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(245,240,232,0.7);
+            transition: border-color 0.25s, color 0.25s, background 0.25s;
+        }
+        .social-btn:hover { border-color: var(--red); color: var(--white); background: rgba(227,6,19,0.08); }
+        .social-btn i { font-size: 1.1rem; color: var(--red); }
+
+        /* ============ FOOTER ============ */
+        footer {
+            background: #000;
+            border-top: 1px solid rgba(245,240,232,0.06);
+            padding: 60px 5% 40px;
+        }
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        @media (max-width: 900px)  { .footer-top { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 520px)  { .footer-top { grid-template-columns: 1fr; } }
+        .footer-brand-name {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--red);
+            line-height: 0.9;
+            margin-bottom: 16px;
+        }
+        .footer-brand-sub {
+            font-family: var(--font-condensed);
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(245,240,232,0.3);
+            margin-bottom: 24px;
+        }
+        .footer-col h5 {
+            font-family: var(--font-condensed);
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        .footer-col p, .footer-col a {
+            font-size: 0.95rem;
+            color: rgba(245,240,232,0.2);
+            line-height: 2;
+            display: block;
+            transition: color 0.2s;
+        }
+        .footer-col a:hover { color: var(--red); }
+        .footer-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 24px;
+            border-top: 1px solid rgba(245,240,232,0.06);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .footer-bottom p {
+            font-size: 0.75rem;
+            color: rgba(245,240,232,0.2);
+            letter-spacing: 2px;
+            font-family: var(--font-condensed);
+            text-transform: uppercase;
+        }
+
+        /* ============ MOBILE NAV CTA ============ */
+        .mobile-cta-bar {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--bg);
+            border-top: 1px solid rgba(245,240,232,0.08);
+            z-index: 900;
+            padding: 12px 5%;
+            gap: 10px;
+        }
+        .mobile-cta-bar .btn-primary, .mobile-cta-bar .btn-ghost {
+            flex: 1;
+            justify-content: center;
+            font-size: 0.85rem;
+            padding: 12px 16px;
+        }
+        @media (max-width: 768px) { .mobile-cta-bar { display: flex; } }
+
+        /* ============ ORARI STRIP ============ */
+        .orari-strip {
+            background: #0a0a0a;
+            padding: 28px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(245,240,232,0.05);
+        }
+        .orari-item {
+            text-align: center;
+        }
+        .orari-days {
+            font-family: var(--font-condensed);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(245,240,232,0.35);
+            margin-bottom: 4px;
+        }
+        .orari-time {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+        .orari-dot {
+            width: 6px; height: 6px;
+            background: var(--red);
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+        .orari-live {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-condensed);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(245,240,232,0.4);
+        }
+
+        /* ============ DIVIDER ============ */
+        .section-divider {
+            height: 1px;
+            background: rgba(245,240,232,0.06);
+            margin: 0;
+        }
+
+        /* ============ SCROLL TO TOP ============ */
+        #scrollTop {
+            position: fixed;
+            bottom: 80px;
+            right: 24px;
+            width: 44px; height: 44px;
+            background: var(--red);
+            color: var(--white);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 800;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #scrollTop.visible { opacity: 1; transform: translateY(0); }
+        #scrollTop:hover { background: var(--red-dark); }
+        @media (max-width: 768px) { #scrollTop { bottom: 80px; } }
+
+    </style>
+</head>
+<body>
+
+    <div id="cursor"></div>
+
+    <!-- ===== NAV ===== -->
+    <nav id="mainNav">
+        <div class="nav-logo">
+            <img src="images/logo.png" alt="Besso Logo" style="height: 50px; width: auto;">
+        </div>
+        <ul class="nav-links">
+            <li><a href="#menu">Menu</a></li>
+            <li><a href="#storia">Chi Siamo</a></li>
+            <li><a href="#location">Location</a></li>
+            <li><a href="#contatti">Contatti</a></li>
+        </ul>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#menu" class="nav-link-mobile">Menu</a>
+        <a href="#storia" class="nav-link-mobile">Chi Siamo</a>
+        <a href="#location" class="nav-link-mobile">Location</a>
+        <a href="#contatti" class="nav-link-mobile">Contatti</a>
+    </div>
+
+    <!-- ===== HERO ===== -->
+    <header class="hero">
+        <div class="hero-bg"></div>
+
+        <div class="stickers">
+            <img class="sticker s1" src="images/sticker1.png" alt="sticker">
+            <img class="sticker s2" src="images/favicon.png" alt="sticker">
+            <div class="sticker s3">NO FAKES</div>
+            <div class="sticker s4">VERY HOT 🔥</div>
+        </div>
+
+        <div class="hero-content">
+            <p class="hero-tag">Est. 2025 — Foggia, Puglia</p>
+            <h1 class="hero-h1">
+                <span class="outline">VERY HOT</span><br>
+                <span class="solid" data-hover="BESSO">BURGER</span>
+            </h1>
+            <p class="hero-sub">BESSO — SMASH BURGER</p>
+            <div class="hero-cta-row">
+                <a href="https://www.moovengo.it" class="btn-primary">
+                    <i class="fas fa-home"></i> ORDINA A DOMICILIO
+                </a>
+                <a href="#storia" class="btn-ghost">
+                    CHI SIAMO <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+
+    </header>
+
+    <!-- ===== MARQUEE TOP ===== -->
+    <div class="marquee-strip">
+        <div class="marquee-inner">
+            <span>A PRANZO E A CENA TUTTI I GIORNI</span>
+            <span>BESSO SMASH BURGER</span>
+            <span>FOGGIA</span>
+            <span>VIA LUIGI ZUPPETTA 13</span>
+            <span>VERY HOT</span>
+            <span>NO FAKES</span>
+            <!-- duplicato per loop continuo -->
+            <span>A PRANZO E A CENA TUTTI I GIORNI</span>
+            <span>BESSO SMASH BURGER</span>
+            <span>FOGGIA</span>
+            <span>VIA LUIGI ZUPPETTA 13</span>
+            <span>VERY HOT</span>
+            <span>NO FAKES</span>
+        </div>
+    </div>
+
+    <!-- ===== ORARI ===== -->
+    <div class="orari-strip">
+        <div class="orari-live">
+            <div class="orari-dot"></div>
+            APERTO OGGI
+        </div>
+        <div class="orari-item">
+            <div class="orari-days">PRANZO</div>
+            <div class="orari-time">12:30 — 15:00</div>
+        </div>
+        <div class="orari-item">
+            <div class="orari-days">CENA</div>
+            <div class="orari-time">19:00 — 23:30</div>
+        </div>
+        <div class="orari-item">
+            <div class="orari-days">TUTTI I GIORNI</div>
+            <div class="orari-time">LUN – DOM</div>
+        </div>
+    </div>
+
+    <!-- ===== MENU / PRODOTTI — HORIZONTAL SCROLL PINNED ===== -->
+    <section id="menu" class="menu-section">
+        <div class="menu-header">
+            <div>
+                <div class="section-label">I NOSTRI BURGER</div>
+                <h2 class="section-title menu-title">
+                    <span class="outline">IL</span>&nbsp;<span class="solid">MENU</span>
+                </h2>
+            </div>
+            <a href="https://www.bessoburger.com/menu/" class="btn-primary">MENU COMPLETO</a>
+        </div>
+
+        <!-- questo wrapper viene pinnato da GSAP ScrollTrigger -->
+        <div class="horizontal-section" id="horizontalSection">
+
+            <div class="product-panel">
+                <div class="menu-card">
+                    <img src="images/bessokids.webp" alt="CHEESEBURGER" class="menu-card-img">
+                    <div class="menu-card-overlay"></div>
+                    <div class="menu-card-number">01</div>
+                    <div class="menu-card-price">€9,00</div>
+                    <div class="menu-card-body">
+                        <div class="menu-card-name outline">CHEESEBURGER</div>
+                        <div class="menu-card-desc">Doppio patty 100% manzo, soffice potato bun, american cheese, senape e ketchup Heinz, cipolla smash, cetriolini agrodolci</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-panel">
+                <div class="menu-card">
+                    <img src="images/trufflebesso.webp" alt="TRUFFLE BESSO" class="menu-card-img">
+                    <div class="menu-card-overlay"></div>
+                    <div class="menu-card-number">02</div>
+                    <div class="menu-card-price">€11,50</div>
+                    <div class="menu-card-body">
+                        <div class="menu-card-name" style="color:var(--red);">TRUFFLE BESSO</div>
+                        <div class="menu-card-desc">Doppio patty 100% manzo, soffice potato bun, salsa mayo al tartufo homemade, formaggio bianco, cipolla crunchy, polvere di tartufo bianco</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-panel">
+                <div class="menu-card">
+                    <img src="images/bigbesso.jpg" alt="BIG BESSO" class="menu-card-img">
+                    <div class="menu-card-overlay"></div>
+                    <div class="menu-card-number">03</div>
+                    <div class="menu-card-price">€10,50</div>
+                    <div class="menu-card-body">
+                        <div class="menu-card-name outline">BIG BESSO</div>
+                        <div class="menu-card-desc">Doppio patty di carne 100% manzo, soffice potato bun, formaggio bianco, pomodoro cuore di bue, bacon crispy, salsa BESSO, dolce cipolla bianca caramellata</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-panel">
+                <div class="menu-card">
+                    <img src="images/originalbesso.webp" alt="ORIGINAL BESSO" class="menu-card-img">
+                    <div class="menu-card-overlay"></div>
+                    <div class="menu-card-number">04</div>
+                    <div class="menu-card-price">€9,50</div>
+                    <div class="menu-card-body">
+                        <div class="menu-card-name" style="color:var(--red);">ORIGINAL BESSO</div>
+                        <div class="menu-card-desc">Doppio patty 100% manzo, soffice potato bun, formaggio affumicato, bacon crispy, cetriolini agrodolci, salsa burger homemade</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-panel">
+                <div class="menu-card">
+                    <img src="images/spicybbq.webp" alt="SPICY BBQ" class="menu-card-img">
+                    <div class="menu-card-overlay"></div>
+                    <div class="menu-card-number">05</div>
+                    <div class="menu-card-price">11,50</div>
+                    <div class="menu-card-body">
+                        <div class="menu-card-name outline">SPICY BBQ</div>
+                        <div class="menu-card-desc">Doppio patty 100% manzo, soffice potato bun, smoked pulled pork, jalapenos (made in Messico), cipolla rossa agrodolce, american cheese, salsa BBQ</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- freccia hint -->
+            <div class="drag-hint">
+                <span>SCROLL</span>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== NUMBERS ===== -->
+    <div class="numbers-section">
+        <div class="numbers-grid">
+            <div class="number-item">
+                <div class="number-val" data-target="9">0</div>
+                <div class="number-label">Burger</div>
+            </div>
+            <div class="number-item">
+                <div class="number-val" data-target="100">0</div>
+                <div class="number-label">% Carne Fresca</div>
+            </div>
+            <div class="number-item">
+                <div class="number-val" data-target="7">0</div>
+                <div class="number-label">Giorni su 7</div>
+            </div>
+            <div class="number-item">
+                <div class="number-val" data-target="2">0</div>
+                <div class="number-label">Città</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CHI SIAMO ===== -->
+    <section id="storia" class="split">
+        <div class="img-side">
+            <img src="images/chisiamo.jpg" alt="Chi siamo">
+        </div>
+        <div class="text-side">
+            <div class="split-tag">CHI SIAMO</div>
+            <h2 class="section-title split-big-title">
+                <span class="outline">BORN</span><br>
+                <span class="solid">FROM</span><br>
+                <span class="outline">FIRE</span>
+            </h2>
+            <p>Quattro amici, una passione bruciante per il burger autentico e una città da conquistare. Besso nasce nel cuore di Foggia nell'ottobre 2025 con una missione sola: il miglior smash burger del Sud Italia.</p>
+            <p style="margin-top:16px;">La carne va schiacciata forte. Il fuoco va accolto. Il risultato va rispettato.</p>
+        </div>
+    </section>
+
+    <!-- ===== LA VISION ===== -->
+    <section class="split reverse">
+        <div class="text-side">
+            <div class="split-tag">LA VISION</div>
+            <h2 class="section-title split-big-title">
+                <span class="solid">NO</span><br>
+                <span class="outline">RULES</span>
+            </h2>
+            <p>Non seguiamo le regole. Le creiamo. Il futuro del burger è qui, ed è maledettamente buono. Prossimamente: Bari. Pescara. Il resto del mondo.</p>
+        </div>
+        <div class="img-side">
+            <img src="images/vision.webp" alt="La Vision">
+        </div>
+    </section>
+
+    <!-- ===== LOCATION ===== -->
+    <section id="location" class="split">
+        <div class="img-side">
+            <img src="images/location.webp" alt="Location Foggia">
+        </div>
+        <div class="text-side">
+            <div class="split-tag">LOCATION</div>
+            <h2 class="section-title split-big-title">
+                <span class="outline">FOGGIA</span><br>
+                <span class="solid">CITY</span>
+            </h2>
+            <p>Siamo nel centro di Foggia. Niente prenotazioni: vieni, entra, smasha.</p>
+            <a href="https://maps.app.goo.gl/zugW5MYnkPwzWnZV8" target="_blank" class="location-badge">
+                <i class="fas fa-map-marker-alt"></i>
+                VIA LUIGI ZUPPETTA 13 — FOGGIA
+            </a>
+        </div>
+    </section>
+
+    <!-- ===== COLLAB MARQUEE ===== -->
+    <div class="collab-section">
+        <div class="collab-track">
+            <span>BESSO</span>
+            <span>VERY HOT BURGER</span>
+            <span>NO FAKE</span>
+            <span>BESSO KIDS</span>
+            <span>FOGGIA</span>
+            <span>SMASH IT</span>
+            <!-- dup -->
+            <span>BESSO</span>
+            <span>VERY HOT BURGER</span>
+            <span>NO FAKE</span>
+            <span>BESSO KIDS</span>
+            <span>FOGGIA</span>
+            <span>SMASH IT</span>
+        </div>
+    </div>
+
+    <!-- ===== FOLLOW ===== -->
+    <section class="follow-section">
+        <div class="section-label">STAY CONNECTED</div>
+        <h2 class="section-title follow-title">
+            <span class="outline">FOLLOW</span>&nbsp;<span class="solid">US</span>
+        </h2>
+        <p class="follow-sub">@bessoburger — ogni giorno dal vivo</p>
+        <div class="social-grid">
+            <a href="https://www.instagram.com/bessoburger" target="_blank" class="social-btn">
+                <i class="fab fa-instagram"></i> INSTAGRAM
+            </a>
+            <a href="https://www.tiktok.com/@bessoburger" target="_blank" class="social-btn">
+                <i class="fab fa-tiktok"></i> TIKTOK
+            </a>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer id="contatti">
+        <div class="footer-top">
+            <div>
+                <div class="nav-logo">
+            <img src="images/logo.png" alt="Besso Logo" style="height: 50px; width: auto;">
+        </div>
+                <div class="footer-brand-sub">VERY HOT BURGER — FOGGIA</div>
+                <p style="font-size:0.88rem; color:rgba(245,240,232,0.2); line-height:1.7; max-width:280px;">
+                    Il miglior smash burger di Foggia. Aperto a pranzo e a cena, tutti i giorni.
+                </p>
+            </div>
+            <div class="footer-col">
+                <h5>Location</h5>
+                <p>Via Luigi Zuppetta, 13<br>71121 Foggia</p>
+            </div>
+            <div class="footer-col">
+                <h5>Orari</h5>
+                <p>Pranzo: 12:30 – 15:00<br>Cena: 19:00 – 23:30</p>
+            </div>
+            <div class="footer-col">
+                <h5>Contatti</h5>
+                <a href="mailto:info@bessoburger.com">inviaci una mail</a>
+                <a href="tel:+393520235353" target="_blank">telefonaci</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 Besso — Very Hot Burger. Tutti i diritti riservati.</p>
+            <p>CREDITS - <a href="https://www.moockup.it" target="_blank">MOOCKUP STUDIO</a></p>
+        </div>
+    </footer>
+
+    <!-- mobile sticky CTA -->
+    <div class="mobile-cta-bar">
+        <a href="https://www.bessoburger.com/menu/" class="btn-primary">MENU</a>
+        <a href="https://maps.app.goo.gl/zugW5MYnkPwzWnZV8" target="_blank" class="btn-ghost">
+            <i class="fas fa-map-marker-alt"></i>
+        </a>
+    </div>
+
+    <!-- scroll to top -->
+    <button id="scrollTop" aria-label="Torna su"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger, Draggable);
+
+        // ---- Custom cursor ----
+        const cursor = document.getElementById('cursor');
+        if (window.matchMedia('(hover: hover)').matches) {
+            window.addEventListener('mousemove', e => {
+                gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.12, ease: 'power2.out' });
+            });
+            document.querySelectorAll('a, button, .menu-card, .social-btn, .sticker').forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+            });
+        }
+
+        // ---- Nav scroll ----
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 60);
+        });
+
+        // ---- Mobile menu ----
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        hamburger.addEventListener('click', () => {
+            const open = hamburger.classList.toggle('open');
+            mobileMenu.style.display = open ? 'flex' : 'none';
+            requestAnimationFrame(() => mobileMenu.classList.toggle('open', open));
+            document.body.style.overflow = open ? 'hidden' : '';
+        });
+        document.querySelectorAll('.nav-link-mobile').forEach(a => {
+            a.addEventListener('click', () => {
+                hamburger.classList.remove('open');
+                mobileMenu.style.display = 'none';
+                mobileMenu.classList.remove('open');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // ---- Draggable stickers — mantengono posizione al rilascio ----
+        gsap.registerPlugin(Draggable);
+        Draggable.create('.sticker', {
+            bounds: '.hero',
+            onPress()  { gsap.to(this.target, { scale: 1.12, duration: 0.15 }); },
+            onRelease(){ gsap.to(this.target, { scale: 1,    duration: 0.15 }); }
+        });
+
+        // ---- Horizontal scroll pin (solo desktop) ----
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) {
+            const panels      = gsap.utils.toArray('.product-panel');
+            const hSection    = document.getElementById('horizontalSection');
+            // la distanza totale da scorrere = larghezza di tutti i panel meno la viewport
+            const totalWidth  = () => hSection.scrollWidth - window.innerWidth;
+
+            gsap.to(panels, {
+                xPercent: -100 * (panels.length - 1),
+                ease: 'none',
+                scrollTrigger: {
+                    trigger:    hSection,
+                    pin:        true,
+                    scrub:      1,
+                    end:        () => '+=' + totalWidth(),
+                    invalidateOnRefresh: true,
+                }
+            });
+        }
+
+        // ---- GSAP scroll animations ----
+        gsap.utils.toArray('.split').forEach(sec => {
+            gsap.from(sec.querySelector('.text-side'), {
+                scrollTrigger: { trigger: sec, start: 'top 75%' },
+                opacity: 0, x: sec.classList.contains('reverse') ? -50 : 50, duration: 0.9, ease: 'power3.out'
+            });
+            gsap.from(sec.querySelector('.img-side'), {
+                scrollTrigger: { trigger: sec, start: 'top 75%' },
+                opacity: 0, scale: 0.96, duration: 1.1, ease: 'power3.out'
+            });
+        });
+
+        gsap.from('.number-item', {
+            scrollTrigger: { trigger: '.numbers-section', start: 'top 80%' },
+            opacity: 0, y: 30, stagger: 0.1, duration: 0.7, ease: 'power3.out'
+        });
+
+        // ---- Counter animation ----
+        document.querySelectorAll('[data-target]').forEach(el => {
+            ScrollTrigger.create({
+                trigger: el,
+                start: 'top 85%',
+                onEnter: () => {
+                    const target = +el.dataset.target;
+                    gsap.to({ val: 0 }, {
+                        val: target,
+                        duration: 1.5,
+                        ease: 'power2.out',
+                        onUpdate() { el.textContent = Math.round(this.targets()[0].val); }
+                    });
+                },
+                once: true
+            });
+        });
+
+        // ---- Hero parallax ----
+        gsap.to('.hero-bg', {
+            scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
+            yPercent: 30, ease: 'none'
+        });
+
+        // ---- Follow section ----
+        gsap.from('.follow-title, .follow-sub, .social-grid', {
+            scrollTrigger: { trigger: '.follow-section', start: 'top 75%' },
+            opacity: 0, y: 30, stagger: 0.15, duration: 0.8, ease: 'power3.out'
+        });
+
+        // ---- Scroll to top ----
+        const scrollTopBtn = document.getElementById('scrollTop');
+        window.addEventListener('scroll', () => {
+            scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+        });
+        scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    </script>
+</body>
+</html>
